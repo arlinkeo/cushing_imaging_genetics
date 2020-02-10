@@ -1,5 +1,5 @@
 # Cell-type and disease enrichment of Cushing genes
-setwd("C:/Users/dkeo/surfdrive/Cushing_ahmed")
+setwd("C:/Users/dkeo/surfdrive/cushing_imaging_genetics/cushing_imaging_genetics")
 options(stringsAsFactors = FALSE)
 
 library(dplyr)
@@ -7,10 +7,13 @@ library(DescTools)
 library(ggplot2)
 source("functions.R")
 
+# Make output folder
+dir.create("output")
+
 ########## Load DEGs ########## 
 
 # degs <- read.delim("labelsvulcanoplotCD")
-# degs <- read.csv("Final_genes_Bauduin.csv")
+degs <- read.csv("../Final_genes_Bauduin.csv")
 
 # Split into down- and upregulated genes and list entrez IDs
 deglist <- list(
@@ -62,7 +65,7 @@ lapply(dimnames(celltype_enrichment)[[3]], function(n){
   x <- celltype_enrichment[,,n]
   x <- cbind('cell-type' = rownames(x), x)
   x <- x[order(x[, "bh"]), ]
-  write.table(x, file = paste0("celltype_enrichment_", n, ".txt"), quote = FALSE, row.names = FALSE)
+  write.table(x, file = paste0("output/celltype_enrichment_", n, ".txt"), quote = FALSE, row.names = FALSE)
 })
 
 # # Check any overlap of DEGs and marker genes
@@ -92,6 +95,6 @@ lapply(dimnames(disease_enrichment)[[3]], function(n){
   x <- disease_enrichment[,,n]
   x <- cbind('disease' = rownames(x), x)
   x <- x[order(x[, "bh"]), ]
-  write.table(x, file = paste0("disease_enrichment_", n, ".txt"), quote = FALSE, row.names = FALSE)
+  write.table(x, file = paste0("output/disease_enrichment_", n, ".txt"), quote = FALSE, row.names = FALSE)
 })
 
