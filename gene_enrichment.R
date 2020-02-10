@@ -13,7 +13,7 @@ dir.create("output")
 ########## Load DEGs ########## 
 
 de_results <- read.csv("../vulcanoplotCD.csv")
-degs <- de_results[abs(de_results$mean.of.y) > 1 & de_results$pvalueadj < 0.05, ]
+degs <- read.csv("../Final_genes_Bauduin.csv")
 
 # Split into down- and upregulated genes and list entrez IDs
 deglist <- list(
@@ -25,11 +25,12 @@ total_genes <- 19992
 
 ########## Volcano plot ##########
 
-df <- de_results[, c("gene_symbol", "pvalue", "pvalueadj", "mean.of.y")]
+df <- de_results
 df$logp <- -log10(df$pvalueadj)
 ymax <- max(df$logp)
 xmax <- max(abs(df$mean.of.y))
-df$info <- ifelse(abs(df$mean.of.y) > 1 & df$pvalueadj < 0.05, '1', '0')
+df$info <- 0
+df[which(df$probe_id %in% degs$ProbeID), "info"] <- 1
 df$info <- as.factor(df$info)
 # df$label <- ""
 # # df[mg_genes, "label"] <- entrezId2Name(mg_genes)
@@ -38,6 +39,7 @@ ggplot(df, aes(mean.of.y, logp, colour = info))+#, label = label)) +
   geom_point(size = .1) +
   # geom_text_repel(force = 5, colour = "black", size = 2.5, nudge_y = 0.1,
                   # fontface = "italic", segment.size = .1) +
+  scale_colour_manual(values = c("0"="grey", "1"="#009E73")) +
   # scale_colour_manual(values = c("#999999", "#56B4E9")) + # color blind friendly
   labs(x = "mean.of.y", y = expression('-log'[10]*' '*italic('P')*'-value')) +
   scale_y_continuous(limits = c(0, ymax)) +
