@@ -12,8 +12,8 @@ dir.create("output")
 
 ########## Load DEGs ########## 
 
-# degs <- read.delim("labelsvulcanoplotCD")
-degs <- read.csv("../Final_genes_Bauduin.csv")
+de_results <- read.csv("../vulcanoplotCD.csv")
+degs <- de_results[abs(de_results$mean.of.y) > 1 & de_results$pvalueadj < 0.05, ]
 
 # Split into down- and upregulated genes and list entrez IDs
 deglist <- list(
@@ -25,29 +25,28 @@ total_genes <- 19992
 
 ########## Volcano plot ##########
 
-# df <- degs[, c("Gene_symbol", "pvalue", "pvalueadj", "meanofy")]
-# df$logp <- -log10(df$pvalueadj)
-# ymax <- max(df$logp)
-# xmax <- max(abs(df$meanofy))
-# df$info <- ifelse(abs(df$meanofy) > 1 & df$pvalueadj < 0.05, '1', '0')
-# df$info <- as.factor(df$info)
+df <- de_results[, c("gene_symbol", "pvalue", "pvalueadj", "mean.of.y")]
+df$logp <- -log10(df$pvalueadj)
+ymax <- max(df$logp)
+xmax <- max(abs(df$mean.of.y))
+df$info <- ifelse(abs(df$mean.of.y) > 1 & df$pvalueadj < 0.05, '1', '0')
+df$info <- as.factor(df$info)
 # df$label <- ""
 # # df[mg_genes, "label"] <- entrezId2Name(mg_genes)
-# ggplot(df, aes(meanofy, logp, colour = info))+#, label = label)) +
-#   geom_point(size = .1) +
-#   # geom_text_repel(force = 5, colour = "black", size = 2.5, nudge_y = 0.1, 
-#                   # fontface = "italic", segment.size = .1) +
-#   scale_colour_manual(values = c("#999999", "#56B4E9")) + # color blind friendly 
-#   labs(x = "FC", y = expression('-log'[10]*' '*italic('P')*'-value')) +
-#   scale_y_continuous(limits = c(0, ymax)) +
-#   scale_x_continuous(limits = c(-xmax, xmax)) +
-#   theme_classic() + 
-#   theme(legend.position = "none") +
-#   ggtitle(r)
-# 
-# pdf("volcanoplot.pdf", 4, 3)
-# vp
-# dev.off()
+pdf("output/volcanoplot.pdf", 4, 3)
+ggplot(df, aes(mean.of.y, logp, colour = info))+#, label = label)) +
+  geom_point(size = .1) +
+  # geom_text_repel(force = 5, colour = "black", size = 2.5, nudge_y = 0.1,
+                  # fontface = "italic", segment.size = .1) +
+  # scale_colour_manual(values = c("#999999", "#56B4E9")) + # color blind friendly
+  labs(x = "mean.of.y", y = expression('-log'[10]*' '*italic('P')*'-value')) +
+  scale_y_continuous(limits = c(0, ymax)) +
+  scale_x_continuous(limits = c(-xmax, xmax)) +
+  geom_hline(yintercept=-log10(0.05), linetype="dashed", size = .25) +
+  geom_vline(xintercept=c(-1,1), linetype="dashed", size = .25) +
+  theme_classic() +
+  theme(legend.position = "none")
+dev.off()
 
 ########## Cell-type enrichment ##########
 
